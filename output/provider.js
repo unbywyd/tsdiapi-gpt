@@ -11,7 +11,7 @@ function expandSchema(schema, definitions) {
     if (!schema)
         return schema;
     if (schema.$ref) {
-        const refName = schema.$ref.replace("#/definitions/", "");
+        const refName = schema.$ref.replace("#/components/schemas/", "");
         return expandSchema(definitions[refName], definitions);
     }
     if (schema.type === "array" && schema.items) {
@@ -45,9 +45,7 @@ class GPTProvider {
             console.error(`❌ Failed to generate JSON Schema for ${dtoClass.name}`);
             return null;
         }
-        //const expandedSchema = expandSchema(jsonSchema, schemas);
-        console.log(JSON.stringify(schemas, null, 2));
-        return null;
+        const expandedSchema = expandSchema(jsonSchema, schemas);
         try {
             const openai = new openai_1.default({ apiKey: process.env.OPENAI_API_KEY });
             const response = await openai.chat.completions.create({
@@ -56,15 +54,44 @@ class GPTProvider {
                 response_format: {
                     type: "json_schema", json_schema: {
                         name: dtoClass.name,
-                        schema: jsonSchema,
+                        schema: expandedSchema,
                     }
                 },
             });
-            const rawData = JSON.parse(response.choices[0]?.message?.content || "{}");
-            return (0, class_transformer_1.plainToInstance)(dtoClass, rawData);
+            try {
+                const message = response.choices[0]?.message;
+                const rawData = JSON.parse(message?.content || "{}");
+                return {
+                    ...message,
+                    result: (0, class_transformer_1.plainToInstance)(dtoClass, rawData),
+                };
+            }
+            catch (e) {
+            }
         }
         catch (error) {
             console.error("❌ GPT JSON Parsing Error:", error);
+            return null;
+        }
+    }
+    async chat(prompt, model) {
+        if (!this.openai) {
+            console.error("❌ OpenAI is not initialized. Please call init() first.");
+            return null;
+        }
+        try {
+            const response = await this.openai.chat.completions.create({
+                model: model || this.config.model,
+                messages: [{ role: "user", content: prompt }],
+            });
+            const message = response.choices[0]?.message;
+            return {
+                ...message,
+                result: message?.content,
+            };
+        }
+        catch (error) {
+            console.error("❌ GPT Chat Error:", error);
             return null;
         }
     }

@@ -1,11 +1,14 @@
 {
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "name": "@tsdiapi/gpt",
   "description": "A TSDIAPI plugin to extend API functionality with gpt.",
   "main": "output/index.js",
   "types": "output/index.d.ts",
   "scripts": {
     "build": "tsc"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "author": "unbywyd",
   "engines": {

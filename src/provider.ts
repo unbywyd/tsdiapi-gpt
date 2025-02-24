@@ -1,16 +1,18 @@
-import { getFromContainer, MetadataStorage } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 import OpenAI from "openai";
 import { PluginOptions } from ".";
 import { AppContext } from "@tsdiapi/server";
 import { plainToInstance } from "class-transformer";
 
+export type GptResponse<T> = OpenAI.Chat.Completions.ChatCompletionMessage & {
+    result: T
+}
 
 function expandSchema(schema: any, definitions: Record<string, any>): any {
     if (!schema) return schema;
 
     if (schema.$ref) {
-        const refName = schema.$ref.replace("#/definitions/", "");
+        const refName = schema.$ref.replace("#/components/schemas/", "");
         return expandSchema(definitions[refName], definitions);
     }
 
@@ -26,7 +28,6 @@ function expandSchema(schema: any, definitions: Record<string, any>): any {
 
     return schema;
 }
-
 
 export class GPTProvider {
     public openai: OpenAI;
@@ -48,18 +49,17 @@ export class GPTProvider {
         prompt: string,
         dtoClass: new () => T,
         model?: string
-    ): Promise<T | null> {
+    ): Promise<GptResponse<T> | null> {
 
         const schemas = validationMetadatasToSchemas()
         const jsonSchema = schemas[dtoClass.name];
-        
+
         if (!jsonSchema) {
             console.error(`❌ Failed to generate JSON Schema for ${dtoClass.name}`);
             return null;
         }
-        //const expandedSchema = expandSchema(jsonSchema, schemas);
-        console.log(JSON.stringify(schemas, null, 2));
-        return null;
+        const expandedSchema = expandSchema(jsonSchema, schemas);
+
         try {
             const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
             const response = await openai.chat.completions.create({
@@ -68,16 +68,45 @@ export class GPTProvider {
                 response_format: {
                     type: "json_schema", json_schema: {
                         name: dtoClass.name,
-                        schema: jsonSchema as any,
+                        schema: expandedSchema as any,
                     }
                 },
             });
 
-            const rawData = JSON.parse(response.choices[0]?.message?.content || "{}");
+            try {
+                const message = response.choices[0]?.message;
+                const rawData = JSON.parse(message?.content || "{}");
+                return {
+                    ...message,
+                    result: plainToInstance(dtoClass, rawData),
+                }
+            } catch (e) {
 
-            return plainToInstance(dtoClass, rawData);
+            }
         } catch (error) {
             console.error("❌ GPT JSON Parsing Error:", error);
+            return null;
+        }
+    }
+
+    async chat(prompt: string, model?: string): Promise<GptResponse<string> | null> {
+        if (!this.openai) {
+            console.error("❌ OpenAI is not initialized. Please call init() first.");
+            return null;
+        }
+        try {
+            const response = await this.openai.chat.completions.create({
+                model: model || this.config.model!,
+                messages: [{ role: "user", content: prompt }],
+            });
+
+            const message = response.choices[0]?.message;
+            return {
+                ...message,
+                result: message?.content,
+            }
+        } catch (error) {
+            console.error("❌ GPT Chat Error:", error);
             return null;
         }
     }
@@ -94,6 +123,7 @@ export class GPTProvider {
 
         return response.choices[0]?.message?.content || "";
     }
+
     async JsonString<T>(prompt: string, jsonSchema: any, model?: string): Promise<T | null> {
         if (!this.openai) {
             console.error("❌ OpenAI is not initialized. Please call init() first.");
