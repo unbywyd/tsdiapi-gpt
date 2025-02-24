@@ -4,8 +4,10 @@ import { PluginOptions } from ".";
 import { AppContext } from "@tsdiapi/server";
 import { plainToInstance } from "class-transformer";
 
-export type GptResponse<T> = OpenAI.Chat.Completions.ChatCompletionMessage & {
-    result: T
+export type GptResponse<T> = {
+    result: T,
+    usage: OpenAI.Completions.CompletionUsage,
+    message: OpenAI.Chat.Completions.ChatCompletionMessage
 }
 
 function expandSchema(schema: any, definitions: Record<string, any>): any {
@@ -59,7 +61,6 @@ export class GPTProvider {
             return null;
         }
         const expandedSchema = expandSchema(jsonSchema, schemas);
-
         try {
             const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
             const response = await openai.chat.completions.create({
@@ -74,10 +75,12 @@ export class GPTProvider {
             });
 
             try {
+                const usage = response.usage;
                 const message = response.choices[0]?.message;
                 const rawData = JSON.parse(message?.content || "{}");
                 return {
-                    ...message,
+                    message: message,
+                    usage,
                     result: plainToInstance(dtoClass, rawData),
                 }
             } catch (e) {
@@ -102,7 +105,8 @@ export class GPTProvider {
 
             const message = response.choices[0]?.message;
             return {
-                ...message,
+                message: message,
+                usage: response.usage,
                 result: message?.content,
             }
         } catch (error) {

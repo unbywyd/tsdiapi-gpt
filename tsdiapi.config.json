@@ -28,5 +28,9 @@
         "message": "Enter the default GPT model to use:"
       }
     }
+  ],
+  "postMessages": [
+    "✅ GPT Plugin has been successfully installed!",
+    "🔹 Use `const gpt = getGPTProvider();` to start using GPT in your project."
   ]
 }

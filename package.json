@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1-alpha.2",
+  "version": "0.0.1-alpha.3",
   "name": "@tsdiapi/gpt",
   "description": "A TSDIAPI plugin to extend API functionality with gpt.",
   "main": "output/index.js",

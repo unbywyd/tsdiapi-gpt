@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import type { AppContext, AppPlugin } from "@tsdiapi/server";
-import { GPTProvider } from "./provider";
+import { GPTProvider, GptResponse } from "./provider";
 export type PluginOptions = {
     apiKey?: string;
     model?: string;
@@ -15,5 +15,6 @@ declare class App implements AppPlugin {
 }
 export declare function getGPTProvider(): GPTProvider;
 export { GPTProvider };
+export type { GptResponse };
 export default function createPlugin(config?: PluginOptions): App;
 //# sourceMappingURL=index.d.ts.map

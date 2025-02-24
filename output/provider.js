@@ -59,10 +59,12 @@ class GPTProvider {
                 },
             });
             try {
+                const usage = response.usage;
                 const message = response.choices[0]?.message;
                 const rawData = JSON.parse(message?.content || "{}");
                 return {
-                    ...message,
+                    message: message,
+                    usage,
                     result: (0, class_transformer_1.plainToInstance)(dtoClass, rawData),
                 };
             }
@@ -86,7 +88,8 @@ class GPTProvider {
             });
             const message = response.choices[0]?.message;
             return {
-                ...message,
+                message: message,
+                usage: response.usage,
                 result: message?.content,
             };
         }

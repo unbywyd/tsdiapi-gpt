@@ -1,8 +1,10 @@
 import OpenAI from "openai";
 import { PluginOptions } from ".";
 import { AppContext } from "@tsdiapi/server";
-export type GptResponse<T> = OpenAI.Chat.Completions.ChatCompletionMessage & {
+export type GptResponse<T> = {
     result: T;
+    usage: OpenAI.Completions.CompletionUsage;
+    message: OpenAI.Chat.Completions.ChatCompletionMessage;
 };
 export declare class GPTProvider {
     openai: OpenAI;
