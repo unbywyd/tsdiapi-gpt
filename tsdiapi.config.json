@@ -1,0 +1,32 @@
+{
+  "name": "gpt",
+  "description": "A TSDIAPI plugin to extend API functionality with gpt.",
+  "variables": [
+    {
+      "name": "OPENAI_API_KEY",
+      "type": "string",
+      "default": "",
+      "configurable": true,
+      "description": "Your OpenAI API key",
+      "validate": {
+        "type": "string",
+        "minLength": 20
+      },
+      "inquirer": {
+        "type": "input",
+        "message": "Enter your OpenAI API key:"
+      }
+    },
+    {
+      "name": "OPENAI_DEFAULT_MODEL",
+      "type": "string",
+      "default": "gpt-4o-mini",
+      "configurable": true,
+      "description": "Default GPT model to use",
+      "inquirer": {
+        "type": "input",
+        "message": "Enter the default GPT model to use:"
+      }
+    }
+  ]
+}
