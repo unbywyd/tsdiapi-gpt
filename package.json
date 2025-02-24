@@ -1,7 +1,7 @@
 {
-  "name": "gpt",
+  "version": "0.0.1-alpha.1",
+  "name": "@tsdiapi/gpt",
   "description": "A TSDIAPI plugin to extend API functionality with gpt.",
-  "version": "1.0.0",
   "main": "output/index.js",
   "types": "output/index.d.ts",
   "scripts": {
