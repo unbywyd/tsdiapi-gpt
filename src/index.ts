@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import type { AppContext, AppPlugin } from "@tsdiapi/server";
-import { GPTProvider, GptResponse } from "./provider";
+import { GPTProvider, GptResponse } from "./provider.js";
 
 let gptProvider: GPTProvider | null = null;
 

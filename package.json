@@ -1,9 +1,10 @@
 {
   "name": "@tsdiapi/gpt",
-  "version": "0.0.1-alpha.4",
-  "description": "A TSDIAPI plugin to extend API functionality with gpt.",
+  "version": "0.1.0",
+  "description": "A TSDIAPI plugin to extend API functionality with GPT.",
   "main": "output/index.js",
   "types": "output/index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc"
   },
@@ -15,7 +16,9 @@
     "node": ">=18.19.0"
   },
   "keywords": [
-    "tsdiapi"
+    "tsdiapi",
+    "gpt",
+    "openai"
   ],
   "license": "MIT",
   "repository": {
@@ -32,18 +35,18 @@
     "generators/"
   ],
   "devDependencies": {
-    "@tsdiapi/server": "^0.0.1-alpha",
     "@types/node": "^22.13.5",
     "typescript": "^5.7.3"
   },
   "peerDependencies": {
+    "@tsdiapi/server": "^0.1.0",
     "reflect-metadata": "^0.2.2",
-    "typedi": "^0.10.0"
-  },
-  "dependencies": {
+    "typedi": "^0.10.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
-    "class-validator-jsonschema": "^5.0.1",
+    "class-validator-jsonschema": "^5.0.1"
+  },
+  "dependencies": {
     "openai": "^4.85.4"
   }
 }

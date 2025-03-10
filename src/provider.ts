@@ -1,8 +1,8 @@
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 import OpenAI from "openai";
-import { PluginOptions } from ".";
 import { AppContext } from "@tsdiapi/server";
 import { plainToInstance } from "class-transformer";
+import { PluginOptions } from "./index.js";
 
 export type GptResponse<T> = {
     result: T,
