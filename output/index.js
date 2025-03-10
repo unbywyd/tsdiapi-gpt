@@ -1,11 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.GPTProvider = void 0;
-exports.getGPTProvider = getGPTProvider;
-exports.default = createPlugin;
-require("reflect-metadata");
-const provider_1 = require("./provider");
-Object.defineProperty(exports, "GPTProvider", { enumerable: true, get: function () { return provider_1.GPTProvider; } });
+import "reflect-metadata";
+import { GPTProvider } from "./provider.js";
 let gptProvider = null;
 const defaultConfig = {
     apiKey: "",
@@ -18,7 +12,7 @@ class App {
     provider;
     constructor(config) {
         this.config = { ...defaultConfig, ...config };
-        this.provider = new provider_1.GPTProvider();
+        this.provider = new GPTProvider();
     }
     async onInit(ctx) {
         if (gptProvider) {
@@ -37,13 +31,14 @@ class App {
         ctx.logger.info("✅ GPT Plugin initialized.");
     }
 }
-function getGPTProvider() {
+export function getGPTProvider() {
     if (!gptProvider) {
         throw new Error("❌ GPT Plugin is not initialized. Use createPlugin() first.");
     }
     return gptProvider;
 }
-function createPlugin(config) {
+export { GPTProvider };
+export default function createPlugin(config) {
     return new App(config);
 }
 //# sourceMappingURL=index.js.map

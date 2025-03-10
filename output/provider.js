@@ -1,12 +1,6 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.GPTProvider = void 0;
-const class_validator_jsonschema_1 = require("class-validator-jsonschema");
-const openai_1 = __importDefault(require("openai"));
-const class_transformer_1 = require("class-transformer");
+import { validationMetadatasToSchemas } from "class-validator-jsonschema";
+import OpenAI from "openai";
+import { plainToInstance } from "class-transformer";
 function expandSchema(schema, definitions) {
     if (!schema)
         return schema;
@@ -24,7 +18,7 @@ function expandSchema(schema, definitions) {
     }
     return schema;
 }
-class GPTProvider {
+export class GPTProvider {
     openai;
     config;
     logger;
@@ -36,10 +30,10 @@ class GPTProvider {
         }
         this.logger = logger;
         this.config = config;
-        this.openai = new openai_1.default({ apiKey: config.apiKey });
+        this.openai = new OpenAI({ apiKey: config.apiKey });
     }
     async jsonDTO(prompt, dtoClass, model) {
-        const schemas = (0, class_validator_jsonschema_1.validationMetadatasToSchemas)();
+        const schemas = validationMetadatasToSchemas();
         const jsonSchema = schemas[dtoClass.name];
         if (!jsonSchema) {
             console.error(`❌ Failed to generate JSON Schema for ${dtoClass.name}`);
@@ -47,7 +41,7 @@ class GPTProvider {
         }
         const expandedSchema = expandSchema(jsonSchema, schemas);
         try {
-            const openai = new openai_1.default({ apiKey: process.env.OPENAI_API_KEY });
+            const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
             const response = await openai.chat.completions.create({
                 model: model || this.config.model,
                 messages: [{ role: "user", content: prompt }],
@@ -65,7 +59,7 @@ class GPTProvider {
                 return {
                     message: message,
                     usage,
-                    result: (0, class_transformer_1.plainToInstance)(dtoClass, rawData),
+                    result: plainToInstance(dtoClass, rawData),
                 };
             }
             catch (e) {
@@ -128,5 +122,4 @@ class GPTProvider {
         }
     }
 }
-exports.GPTProvider = GPTProvider;
 //# sourceMappingURL=provider.js.map

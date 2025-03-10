@@ -1,6 +1,6 @@
 import OpenAI from "openai";
-import { PluginOptions } from ".";
 import { AppContext } from "@tsdiapi/server";
+import { PluginOptions } from "./index.js";
 export type GptResponse<T> = {
     result: T;
     usage: OpenAI.Completions.CompletionUsage;
