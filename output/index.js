@@ -15,23 +15,24 @@ class App {
         this.provider = new GPTProvider();
     }
     async onInit(ctx) {
+        const logger = ctx.fastify.log;
         if (gptProvider) {
-            ctx.logger.warn("⚠ GPT Plugin is already initialized. Skipping re-initialization.");
+            logger.warn("⚠ GPT Plugin is already initialized. Skipping re-initialization.");
             return;
         }
         this.context = ctx;
-        const appConfig = ctx.config.appConfig || {};
-        this.config.apiKey = this.config.apiKey || appConfig["OPENAI_API_KEY"];
-        this.config.model = this.config.model || appConfig["OPENAI_MODEL_ID"] || "gpt-4o";
+        const config = ctx.projectConfig;
+        this.config.apiKey = config.get('OPENAI_API_KEY', this.config.apiKey);
+        this.config.model = config.get('OPENAI_MODEL_ID', this.config.model || defaultConfig.model);
         if (!this.config.apiKey) {
             throw new Error("❌ GPT Plugin is missing an API key.");
         }
-        this.provider.init(this.config, ctx.logger);
+        this.provider.init(this.config);
         gptProvider = this.provider;
-        ctx.logger.info("✅ GPT Plugin initialized.");
+        ctx.fastify.decorate("gpt", this.provider);
     }
 }
-export function getGPTProvider() {
+export function useGPTProvider() {
     if (!gptProvider) {
         throw new Error("❌ GPT Plugin is not initialized. Use createPlugin() first.");
     }

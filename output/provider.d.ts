@@ -1,6 +1,6 @@
-import OpenAI from "openai";
-import { AppContext } from "@tsdiapi/server";
-import { PluginOptions } from "./index.js";
+import { OpenAI } from "openai";
+import type { PluginOptions } from "./index.js";
+import { TSchema, Static } from "@sinclair/typebox";
 export type GptResponse<T> = {
     result: T;
     usage: OpenAI.Completions.CompletionUsage;
@@ -9,10 +9,9 @@ export type GptResponse<T> = {
 export declare class GPTProvider {
     openai: OpenAI;
     private config;
-    logger: AppContext['logger'];
     constructor();
-    init(config: PluginOptions, logger: AppContext['logger']): void;
-    jsonDTO<T>(prompt: string, dtoClass: new () => T, model?: string): Promise<GptResponse<T> | null>;
+    init(config: PluginOptions): void;
+    jsonDTO<T extends TSchema>(prompt: string, schema: T, model?: string): Promise<GptResponse<Static<T>> | null>;
     chat(prompt: string, model?: string): Promise<GptResponse<string> | null>;
     chatString(prompt: string, model?: string): Promise<string>;
     JsonString<T>(prompt: string, jsonSchema: any, model?: string): Promise<T | null>;

@@ -5,6 +5,11 @@ export type PluginOptions = {
     apiKey?: string;
     model?: string;
 };
+declare module "fastify" {
+    interface FastifyInstance {
+        gpt: GPTProvider;
+    }
+}
 declare class App implements AppPlugin {
     name: string;
     config: PluginOptions;
@@ -13,7 +18,7 @@ declare class App implements AppPlugin {
     constructor(config?: PluginOptions);
     onInit(ctx: AppContext): Promise<void>;
 }
-export declare function getGPTProvider(): GPTProvider;
+export declare function useGPTProvider(): GPTProvider;
 export { GPTProvider };
 export type { GptResponse };
 export default function createPlugin(config?: PluginOptions): App;
