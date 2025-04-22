@@ -53,7 +53,7 @@ createApp({
 
 ```ts
 import { Type } from "@sinclair/typebox";
-import { getGPTProvider } from "@tsdiapi/gpt";
+import { useGPTProvider } from "@tsdiapi/gpt";
 
 const UserSchema = Type.Object({
   name: Type.String(),
@@ -61,7 +61,7 @@ const UserSchema = Type.Object({
 });
 
 async function run() {
-  const gpt = getGPTProvider();
+  const gpt = useGPTProvider();
   const response = await gpt.jsonDTO("Generate a user", UserSchema);
   console.log(response?.result);
 }
@@ -74,10 +74,10 @@ async function run() {
 ### 💬 Basic Chat Completion
 
 ```ts
-import { getGPTProvider } from "@tsdiapi/gpt";
+import { useGPTProvider } from "@tsdiapi/gpt";
 
 async function run() {
-  const gpt = getGPTProvider();
+  const gpt = useGPTProvider();
   const response = await gpt.chat("Tell me a dad joke.");
   console.log(response?.result);
 }
@@ -99,7 +99,7 @@ const schema = {
   required: ["title", "description"],
 };
 
-const gpt = getGPTProvider();
+const gpt = useGPTProvider();
 const response = await gpt.JsonString("Describe a new product", schema);
 console.log(response);
 ```

@@ -31,6 +31,6 @@
   ],
   "postMessages": [
     "✅ GPT Plugin has been successfully installed!",
-    "🔹 Use `const gpt = getGPTProvider();` to start using GPT in your project."
+    "🔹 Use `const gpt = useGPTProvider();` to start using GPT in your project."
   ]
 }
