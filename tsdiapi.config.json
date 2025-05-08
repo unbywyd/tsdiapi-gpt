@@ -29,6 +29,26 @@
       }
     }
   ],
+  "generators": [
+    {
+      "name": "controller",
+      "description": "Generate a new controller in the API",
+      "requiredPackages": [
+        "@tsdiapi/prisma"
+      ],
+      "files": [
+        {
+          "source": "generators/controller/*.*",
+          "destination": ".",
+          "overwrite": false,
+          "isHandlebarsTemplate": true
+        }
+      ],
+      "postMessages": [
+        "✅ Controller {{name}} created successfully!"
+      ]
+    }
+  ],
   "postMessages": [
     "✅ GPT Plugin has been successfully installed!",
     "🔹 Use `const gpt = useGPTProvider();` to start using GPT in your project."
