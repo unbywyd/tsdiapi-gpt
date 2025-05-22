@@ -20,7 +20,7 @@ const schema = Type.Object({
 export default function PrismaAiModule({ useRoute, appDir }: AppContext): void {
   const gpt = useGPTProvider();
   useRoute("ai")
-    .post("/statistics")
+    .post("/db-statistics")
     .body(
       Type.Object({
         request: Type.String(),
@@ -162,9 +162,9 @@ Your response must strictly follow this JSON structure. If the request is invali
             6. Keep it under 100 characters if possible
             
             Example format:
-            "Active users count over the last 30 days"
-            "Products in Electronics category with price above $100"
-            "Total sales by region for current month"`;
+            Active users count over the last 30 days
+            Products in Electronics category with price above $100
+            Total sales by region for current month`;
 
       const description = await gpt.chat(descriptionPrompt);
       const prisma = usePrisma<PrismaClient>();

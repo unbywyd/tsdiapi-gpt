@@ -41,7 +41,7 @@
           "source": "generators/controller/*.*",
           "destination": ".",
           "overwrite": false,
-          "isHandlebarsTemplate": true
+          "isHandlebarsTemplate": false
         }
       ],
       "postMessages": [
