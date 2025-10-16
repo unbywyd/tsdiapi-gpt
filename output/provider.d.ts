@@ -5,6 +5,7 @@ export type GptResponse<T> = {
     result: T;
     usage: OpenAI.Completions.CompletionUsage;
     message: OpenAI.Chat.Completions.ChatCompletionMessage;
+    model?: string;
 };
 export declare class GPTProvider {
     openai: OpenAI;

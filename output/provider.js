@@ -13,13 +13,14 @@ export class GPTProvider {
         this.openai = new OpenAI({ apiKey: config.apiKey });
     }
     async jsonDTO(prompt, schema, model) {
+        const useModel = model || this.config.model;
         if (!this.openai) {
             console.error("❌ OpenAI is not initialized. Please call init() first.");
             return null;
         }
         try {
             const response = await this.openai.chat.completions.create({
-                model: model || this.config.model,
+                model: useModel,
                 messages: [{ role: "user", content: prompt }],
                 response_format: {
                     type: "json_schema",
@@ -37,6 +38,7 @@ export class GPTProvider {
                 message,
                 usage,
                 result,
+                model: useModel,
             };
         }
         catch (error) {
@@ -49,9 +51,10 @@ export class GPTProvider {
             console.error("❌ OpenAI is not initialized. Please call init() first.");
             return null;
         }
+        const useModel = model || this.config.model;
         try {
             const response = await this.openai.chat.completions.create({
-                model: model || this.config.model,
+                model: useModel,
                 messages: [{ role: "user", content: prompt }],
             });
             const message = response.choices[0]?.message;
@@ -59,6 +62,7 @@ export class GPTProvider {
                 message: message,
                 usage: response.usage,
                 result: message?.content,
+                model: useModel,
             };
         }
         catch (error) {
