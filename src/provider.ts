@@ -6,7 +6,8 @@ import { Value } from '@sinclair/typebox/value';
 export type GptResponse<T> = {
     result: T,
     usage: OpenAI.Completions.CompletionUsage,
-    message: OpenAI.Chat.Completions.ChatCompletionMessage
+    message: OpenAI.Chat.Completions.ChatCompletionMessage,
+    model?: string,
 }
 
 export class GPTProvider {
@@ -28,6 +29,7 @@ export class GPTProvider {
         schema: T,
         model?: string
     ): Promise<GptResponse<Static<T>> | null> {
+        const useModel = model || this.config.model!;
         if (!this.openai) {
             console.error("❌ OpenAI is not initialized. Please call init() first.");
             return null;
@@ -35,7 +37,7 @@ export class GPTProvider {
 
         try {
             const response = await this.openai.chat.completions.create({
-                model: model || this.config.model!,
+                model: useModel,
                 messages: [{ role: "user", content: prompt }],
                 response_format: {
                     type: "json_schema",
@@ -55,6 +57,7 @@ export class GPTProvider {
                 message,
                 usage,
                 result,
+                model: useModel,
             };
         } catch (error) {
             console.error("❌ GPT JSON Parsing Error:", error);
@@ -67,9 +70,10 @@ export class GPTProvider {
             console.error("❌ OpenAI is not initialized. Please call init() first.");
             return null;
         }
+        const useModel = model || this.config.model!;
         try {
             const response = await this.openai.chat.completions.create({
-                model: model || this.config.model!,
+                model: useModel,
                 messages: [{ role: "user", content: prompt }],
             });
 
@@ -78,6 +82,7 @@ export class GPTProvider {
                 message: message,
                 usage: response.usage,
                 result: message?.content,
+                model: useModel,
             }
         } catch (error) {
             console.error("❌ GPT Chat Error:", error);
