@@ -1,6 +1,6 @@
 {
   "name": "@tsdiapi/gpt",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "A TSDIAPI plugin to extend API functionality with GPT.",
   "main": "output/index.js",
   "types": "output/index.d.ts",
@@ -39,8 +39,8 @@
     "typescript": "^5.7.3"
   },
   "peerDependencies": {
-    "@sinclair/typebox": "^0.34.31",
-    "@tsdiapi/server": "^0.3.0",
+    "@sinclair/typebox": "^0.34.41",
+    "@tsdiapi/server": "^0.4.0",
     "reflect-metadata": "^0.2.2"
   },
   "dependencies": {
