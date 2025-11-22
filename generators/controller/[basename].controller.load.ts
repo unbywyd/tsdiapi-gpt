@@ -2,7 +2,7 @@ import { PrismaClient } from "@generated/prisma/index.js";
 import { Type } from "@sinclair/typebox";
 import { useGPTProvider } from "@tsdiapi/gpt";
 import { usePrisma } from "@tsdiapi/prisma";
-import { AppContext, response400 } from "@tsdiapi/server";
+import { AppContext, response400, addSchema } from "@tsdiapi/server";
 import { readFileSafe } from "fsesm";
 import path from "node:path";
 
@@ -19,30 +19,75 @@ const schema = Type.Object({
 
 export default function PrismaAiModule({ useRoute, appDir }: AppContext): void {
   const gpt = useGPTProvider();
+
+  // Схемы для маршрута /db-statistics
+  const DbStatisticsBodySchema = addSchema(Type.Object({
+    request: Type.String(),
+    language: Type.String(),
+  }, { $id: 'GPTDbStatisticsBodySchema' }));
+
+  const DbStatisticsResponseSchema = addSchema(Type.Object({
+    response: Type.Any({
+      default: {},
+    }),
+    requestError: Type.Optional(Type.String()),
+    description: Type.String(),
+  }, { $id: 'GPTDbStatisticsResponseSchema' }));
+
+  const DbStatisticsErrorSchema = addSchema(Type.Object({
+    error: Type.String(),
+  }, { $id: 'GPTDbStatisticsErrorSchema' }));
+
+  // Схемы для маршрута /generate-text
+  const GenerateTextBodySchema = addSchema(Type.Object({
+    request: Type.String(),
+    language: Type.String(),
+    context: Type.String()
+  }, { $id: 'GPTGenerateTextBodySchema' }));
+
+  const GenerateTextResponseSchema = addSchema(Type.Object({
+    response: Type.String(),
+  }, { $id: 'GPTGenerateTextResponseSchema' }));
+
+  // Схемы для маршрута /generate-html
+  const GenerateHtmlBodySchema = addSchema(Type.Object({
+    request: Type.String(),
+    language: Type.String(),
+    context: Type.String()
+  }, { $id: 'GPTGenerateHtmlBodySchema' }));
+
+  const GenerateHtmlResponseSchema = addSchema(Type.Object({
+    response: Type.String(),
+  }, { $id: 'GPTGenerateHtmlResponseSchema' }));
+
+  // Схемы для маршрута /generate-page
+  const GeneratePageBodySchema = addSchema(Type.Object({
+    subject: Type.String(),
+    request: Type.String(),
+    language: Type.String(),
+    context: Type.String()
+  }, { $id: 'GPTGeneratePageBodySchema' }));
+
+  const GeneratePageResponseSchema = addSchema(Type.Object({
+    response: Type.String(),
+  }, { $id: 'GPTGeneratePageResponseSchema' }));
+
+  // Схемы для маршрута /generate-template
+  const GenerateTemplateBodySchema = addSchema(Type.Object({
+    request: Type.String(),
+    language: Type.String(),
+    keywords: Type.Array(Type.String()),
+    context: Type.String()
+  }, { $id: 'GPTGenerateTemplateBodySchema' }));
+
+  const GenerateTemplateResponseSchema = addSchema(Type.Object({
+    response: Type.String(),
+  }, { $id: 'GPTGenerateTemplateResponseSchema' }));
   useRoute("ai")
     .post("/db-statistics")
-    .body(
-      Type.Object({
-        request: Type.String(),
-        language: Type.String(),
-      })
-    )
-    .code(
-      200,
-      Type.Object({
-        response: Type.Any({
-          default: {},
-        }),
-        requestError: Type.Optional(Type.String()),
-        description: Type.String(),
-      })
-    )
-    .code(
-      400,
-      Type.Object({
-        error: Type.String(),
-      })
-    )
+    .body(DbStatisticsBodySchema)
+    .code(200, DbStatisticsResponseSchema)
+    .code(400, DbStatisticsErrorSchema)
     .handler(async (req, res) => {
       const { request, language } = req.body;
 
@@ -221,19 +266,8 @@ Your response must strictly follow this JSON structure. If the request is invali
 
   useRoute("ai")
     .post("/generate-text")
-    .body(
-      Type.Object({
-        request: Type.String(),
-        language: Type.String(),
-        context: Type.String()
-      })
-    )
-    .code(
-      200,
-      Type.Object({
-        response: Type.String(),
-      })
-    )
+    .body(GenerateTextBodySchema)
+    .code(200, GenerateTextResponseSchema)
     .handler(async (req, res) => {
       const { request, language, context } = req.body;
 
@@ -263,19 +297,8 @@ Language: ${language}`;
 
   useRoute("ai")
     .post("/generate-html")
-    .body(
-      Type.Object({
-        request: Type.String(),
-        language: Type.String(),
-        context: Type.String()
-      })
-    )
-    .code(
-      200,
-      Type.Object({
-        response: Type.String(),
-      })
-    )
+    .body(GenerateHtmlBodySchema)
+    .code(200, GenerateHtmlResponseSchema)
     .handler(async (req, res) => {
       const { request, language, context } = req.body;
       const systemPrompt = `You are an HTML generation assistant for an administrative panel.
@@ -316,20 +339,8 @@ Important rules:
 
   useRoute("ai")
     .post("/generate-page")
-    .body(
-      Type.Object({
-        subject: Type.String(),
-        request: Type.String(),
-        language: Type.String(),
-        context: Type.String()
-      })
-    )
-    .code(
-      200,
-      Type.Object({
-        response: Type.String(),
-      })
-    )
+    .body(GeneratePageBodySchema)
+    .code(200, GeneratePageResponseSchema)
     .handler(async (req, res) => {
       const { subject, request, language, context } = req.body;
 
@@ -387,20 +398,8 @@ Generate content that matches the subject and follows the description provided.`
 
   useRoute("ai")
     .post("/generate-template")
-    .body(
-      Type.Object({
-        request: Type.String(),
-        language: Type.String(),
-        keywords: Type.Array(Type.String()),
-        context: Type.String()
-      })
-    )
-    .code(
-      200,
-      Type.Object({
-        response: Type.String(),
-      })
-    )
+    .body(GenerateTemplateBodySchema)
+    .code(200, GenerateTemplateResponseSchema)
     .handler(async (req, res) => {
       const { request, language, keywords, context } = req.body;
 
